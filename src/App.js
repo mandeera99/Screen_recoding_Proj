@@ -1,25 +1,35 @@
+// src/App.js
+import React from 'react';
+import useScreenRecorder from './hooks/useScreenRecorder';
+import useNetworkLogger from './hooks/useNetworkLogger';
+import { uploadToS3 } from './utils/uploadToS3';
 import logo from './logo.svg';
 import './App.css';
 
-function App() {
+const App = () => {
+  const { isRecording, startRecording, stopRecording } = useScreenRecorder();
+
+  useNetworkLogger();
+
+  const handleStopRecording = async () => {
+    const blob = await stopRecording();
+    await uploadToS3(blob, `recording-${Date.now()}.webm`);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Screen Recording</h1>
+      <header className="">
+      <img src={logo} className="App-logo" alt="logo" /> </header>
+      <button onClick={startRecording} disabled={isRecording}>
+        Start Recording
+      </button>
+      <button onClick={handleStopRecording} disabled={!isRecording}>
+        Stop Recording
+      </button>
+     
     </div>
   );
-}
+};
 
 export default App;
